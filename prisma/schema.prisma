@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Department {
+  id    Int    @id @default(autoincrement())
+  title String
+}
+
+model Position {
+  id    Int     @id @default(autoincrement())
+  title String
+  Staff Staff[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  Staff Staff?
+}
+
+//employee
+model Staff {
+  id         Int       @id @default(autoincrement())
+  fullname   String
+  News       News[] //one to many
+  Position   Position @relation(fields: [positionId], references: [id]) //one to one
+  positionId Int
+  User   User? @relation(fields: [userId], references: [id]) //one to one, ? optional
+  userId Int?
+}
+
+model News {
+  id      Int    @id @default(autoincrement())
+  title   String @db.VarChar(250)
+  picture String @default("nopic.png")
+  staffId Int
+  Staff   Staff  @relation(fields: [staffId], references: [id])
+  // @@map("tbl_news") //ref db name
+}
